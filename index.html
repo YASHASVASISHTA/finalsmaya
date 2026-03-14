@@ -1141,7 +1141,7 @@
             <div class="hero-content-main animate-right">
     <div class="hero-badge">✨ Premium Properties in Mysore</div>
     <h1>Premium <em>Plots for Sale</em> in <span id="rotating-location">Vijayanagar 3rd Stage</span></h1>
-    <p>Discover the finest residential plots in Mysore,first-class amenities and A-Khata properties. Your dream home awaits!</p>
+    <p>Discover the finest residential plots in Mysore ,first-class amenities and A-Khata properties. Your dream home awaits!</p>
     <div class="hero-buttons">
        <a href="plot.html" class="btn btn-primary">Book Plot Online</a>
         <button class="btn btn-outline" onclick="openContactModal()">Contact Us</button>
@@ -1853,22 +1853,7 @@ setInterval(rotateLocation, 2000);
         });
 
         // Handle contact form submission
-        function handleContactForm(event) {
-            event.preventDefault();
-            const name = document.getElementById('modalName').value;
-            const phone = document.getElementById('modalPhone').value;
-            const message = document.getElementById('modalMessage').value;
-            
-            // Log form data (in real app, send to server)
-            console.log('Form submitted:', { name, phone, message });
-            
-            // Show success message
-            alert('Thank you! We will contact you shortly.');
-            
-            // Reset form and close modal
-            event.target.reset();
-            closeContactModal();
-        }
+       
 
         // ACTIVE NAVIGATION LINK
         document.querySelectorAll('.nav-links a').forEach(link => {
@@ -1918,5 +1903,60 @@ setInterval(() => {
     goToProject(currentProject);
 }, 3000);
     </script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Your Firebase Configuration (Matches your Admin Panel)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBizlZkXOH8TUjXrlqShfcaclYQHUI352c",
+        authDomain: "dark-valor-452618-u5.firebaseapp.com",
+        projectId: "dark-valor-452618-u5",
+        storageBucket: "dark-valor-452618-u5.firebasestorage.app",
+        messagingSenderId: "216503837658",
+        appId: "1:216503837658:web:e0bda55bfbf27cddbf16e3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Modern handleContactForm function
+    window.handleContactForm = async function(event) {
+        event.preventDefault();
+        
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        
+        // Disable button to prevent double submission
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+        const name = document.getElementById('modalName').value;
+        const phone = document.getElementById('modalPhone').value;
+        const message = document.getElementById('modalMessage').value;
+
+        try {
+            // Adding data to 'enquiries' collection
+            await addDoc(collection(db, "enquiries"), {
+                name: name,
+                phone: phone,
+                message: message,
+                timestamp: serverTimestamp(),
+                project: message, // Default for the main modal
+                status: "new"
+            });
+
+            alert('Thank you! Your inquiry has been received.');
+            event.target.reset();
+            closeContactModal();
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert('Something went wrong. Please try again or call us directly.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    };
+</script>
 </body>
 </html>
