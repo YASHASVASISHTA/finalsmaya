@@ -859,11 +859,12 @@
         <div class="container">
             <!-- FILTER TABS -->
             <div class="project-tabs">
-                <button class="tab-btn active" data-filter="all">All Projects</button>
-                <button class="tab-btn" data-filter="completed">Completed</button>
-                <button class="tab-btn" data-filter="ongoing">Ongoing</button>
-                <button class="tab-btn" data-filter="upcoming">Upcoming</button>
-            </div>
+    <button class="tab-btn active" data-filter="available">Available for Sale</button>
+    <button class="tab-btn" data-filter="all">All Projects</button>
+    <button class="tab-btn" data-filter="completed">Completed</button>
+    <button class="tab-btn" data-filter="ongoing">Ongoing</button>
+    <button class="tab-btn" data-filter="upcoming">Upcoming</button>
+</div>
 
             <!-- PROJECTS GRID -->
             <div class="projects-grid" id="projectsGrid">
@@ -887,13 +888,17 @@
                 <!-- Key Details Grid -->
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <h4>Land Area</h4>
-                        <p id="modalArea"></p>
-                    </div>
-                    <div class="detail-item">
-                        <h4>Total Sites</h4>
-                        <p id="modalSites"></p>
-                    </div>
+        <h4>Land Area</h4>
+        <p id="modalArea"></p>
+    </div>
+    <div class="detail-item" id="surveyNoContainer" style="display: none;">
+        <h4>Survey Number</h4>
+        <p id="modalSurveyNo"></p>
+    </div>
+    <div class="detail-item">
+        <h4>Total Sites</h4>
+        <p id="modalSites"></p>
+    </div>
                     <div class="detail-item">
                         <h4>Site Dimension</h4>
                         <p id="modalDimension"></p>
@@ -999,17 +1004,24 @@
             id: doc.id,
             ...doc.data()
         }));
-        renderProjects('all');
+        renderProjects('available');
     });
 
     // 5. RENDER PROJECTS TO THE GRID
    window.renderProjects = function(filter) {
-        const grid = document.getElementById('projectsGrid');
-        grid.innerHTML = '';
+    const grid = document.getElementById('projectsGrid');
+    grid.innerHTML = '';
 
-        const filtered = filter === 'all' 
-            ? projects 
-            : projects.filter(p => p.progress?.toLowerCase() === filter.toLowerCase());
+    let filtered;
+    if (filter === 'all') {
+        filtered = projects;
+    } else if (filter === 'available') {
+        // Only show projects where available for sale is "Yes"
+        filtered = projects.filter(p => p.isAvailable === "Yes");
+    } else {
+        // Filter by progress (ongoing, completed, etc)
+        filtered = projects.filter(p => p.progress?.toLowerCase() === filter.toLowerCase());
+    }
 
         filtered.forEach(project => {
             const card = document.createElement('div');
@@ -1076,6 +1088,15 @@
         const controls = document.getElementById('carouselControls');
         carouselSlides.innerHTML = '';
         controls.innerHTML = '';
+        const surveyContainer = document.getElementById('surveyNoContainer');
+    const surveyText = document.getElementById('modalSurveyNo');
+    
+    if (project.surveyNo && project.surveyNo.trim() !== "") {
+        surveyText.textContent = project.surveyNo;
+        surveyContainer.style.display = "block";
+    } else {
+        surveyContainer.style.display = "none";
+    }
 
         // CHANGED: Create array with plotImg strictly at index 0
         let allImages = [];

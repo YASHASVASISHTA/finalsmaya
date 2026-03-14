@@ -225,10 +225,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getFirestore, collection, onSnapshot, addDoc, serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+       import { 
+    getFirestore, collection, onSnapshot, addDoc, serverTimestamp,
+    query, where // Add these two
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         // 1. Setup Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBizlZkXOH8TUjXrlqShfcaclYQHUI352c",
@@ -247,15 +247,29 @@
         let plotUnsub = null;
 
         // 2. Load Projects into Dropdown
-        onSnapshot(collection(db, "projects"), (snap) => {
-            const select = document.getElementById('projectSelect');
-            select.innerHTML = '<option value="">-- Choose Project --</option>';
-            snap.forEach(doc => {
-                const data = doc.data();
-                projects[doc.id] = data;
-                select.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
-            });
-        });
+        // 2. Load Projects into Dropdown (Filtered for Available for Sale)
+const projectsRef = collection(db, "projects");
+const q = query(projectsRef, where("isAvailable", "==", "Yes"));
+
+onSnapshot(q, (snap) => {
+    const select = document.getElementById('projectSelect');
+    // Save the default first option
+    select.innerHTML = '<option value="">-- Choose Project --</option>';
+    
+    // Clear local projects object to prevent stale data
+    projects = {}; 
+
+    snap.forEach(doc => {
+        const data = doc.data();
+        projects[doc.id] = data;
+        select.innerHTML += `<option value="${doc.id}">${data.name}</option>`;
+    });
+
+    // Optional: If no projects are available, update the message
+    if (snap.empty) {
+        select.innerHTML = '<option value="">No projects currently available</option>';
+    }
+});
 
         // 3. Handle Project Selection
         document.getElementById('projectSelect').onchange = (e) => {
