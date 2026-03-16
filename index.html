@@ -392,59 +392,62 @@
 /* Update these specific sections in your <style> */
 
 /* Update the banner-carousel styles */
+/* --- NEW CLEAN CAROUSEL --- */
 .banner-carousel {
     position: relative;
     width: 100%;
-    max-width: 600px; /* Limits size so a square image isn't giant on desktop */
-    margin: 0 auto 40px;
-    aspect-ratio: 1 / 1; /* Forces the carousel to be square */
-    border-radius: 16px;
+    max-width: 800px; /* Adjust based on your preference */
+    margin: 0 auto;
     overflow: hidden;
-    background: #f0f0f0;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    background: #fff;
+}
+
+.carousel-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+    min-width: 100%;
+    position: relative;
+    display: block; /* Removed absolute positioning to let height flow */
+    opacity: 1; /* Resetting your previous opacity logic */
+    visibility: visible;
 }
 
 .carousel-item img {
     width: 100%;
-    height: 100%;
-    object-fit: contain; 
+    height: auto; /* This is the magic: it follows the image's height */
     display: block;
+    object-fit: contain;
 }
-    .carousel-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
 
-        .carousel-item.active { opacity: 1; }
+.carousel-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
 
-        .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s;
+}
 
-        .carousel-dots {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .dot.active { background: var(--gold); width: 28px; border-radius: 5px; }
+.dot.active {
+    background: var(--gold);
+    width: 25px;
+    border-radius: 5px;
+}
 
         /* SERVICES SECTION */
         .services-section { background: var(--white); }
@@ -1063,18 +1066,17 @@
 /* GLOBAL IMAGE FIX */
 
 /* CONTAINER RESET */
-/* This targets the height of boxes you previously set to 300px or 350px */
-.banner-carousel, 
+/* DELETE OR COMMENT THIS OUT */
+ .banner-carousel, 
 .project-item div, 
 .blog-image {
-  /* Allows containers to grow/shrink with the image */
-    min-height: 200px; /* Prevents the box from collapsing if image loads slow */
-    max-height: 500px; /* Prevents images from becoming too tall on desktop */
+    min-height: 200px;
+    max-height: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent; /* Or var(--cream-dark) if you want a placeholder color */
-}
+    background: transparent;
+} */
     </style>
 </head>
 <body>
@@ -1186,10 +1188,11 @@ function rotateLocation() {
 setInterval(rotateLocation, 2000);
 </script> 
 
- <section style="padding: 60px 0; background: var(--cream);">
-        <div class="container">
-            <div class="banner-carousel">
-                <div class="carousel-item active">
+<section style="padding: 40px 0; background: var(--cream);">
+    <div class="container">
+        <div class="banner-carousel">
+            <div class="carousel-container" id="carouselContainer">
+                <div class="carousel-item">
                     <img src="CAROUSEL1.jpeg" alt="Premium Plot">
                 </div>
                 <div class="carousel-item">
@@ -1198,15 +1201,15 @@ setInterval(rotateLocation, 2000);
                 <div class="carousel-item">
                     <img src="UDBOOR.png" alt="Amenities">
                 </div>
-                <div class="carousel-dots">
-                    <div class="dot active" onclick="goToSlide(0)"></div>
-                    <div class="dot" onclick="goToSlide(1)"></div>
-                    <div class="dot" onclick="goToSlide(2)"></div>
-                </div>
+            </div>
+            <div class="carousel-dots">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
             </div>
         </div>
-    </section>   
- 
+    </div>
+</section>
 
 <style>
     /* --- PROJECT CAROUSEL STYLES --- */
@@ -1726,6 +1729,10 @@ setInterval(rotateLocation, 2000);
 
     <!-- JAVASCRIPT -->
     <script>
+
+
+
+
         // DATE AND TIME
         function updateDateTime() {
             const now = new Date();
@@ -1754,30 +1761,42 @@ setInterval(rotateLocation, 2000);
         }
 
         // BANNER CAROUSEL
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-item');
-        const dots = document.querySelectorAll('.dot');
+        // --- UPDATED BANNER CAROUSEL LOGO ---
+let currentSlide = 0;
+// We target the container that holds all slides to move it horizontally
+const container = document.getElementById('carouselContainer'); 
+const dots = document.querySelectorAll('.dot');
+const totalSlides = document.querySelectorAll('.carousel-item').length;
 
-        function showSlide(n) {
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            slides[n].classList.add('active');
-            dots[n].classList.add('active');
-        }
+function goToSlide(n) {
+    currentSlide = n;
+    // This moves the entire row of images left or right
+    const offset = -currentSlide * 100; 
+    if(container) {
+        container.style.transform = `translateX(${offset}%)`;
+    }
+    
+    // Update the gold indicator dots
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === n);
+    });
+}
 
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % slides.length;
-            showSlide(currentSlide);
-        }
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    goToSlide(currentSlide);
+}
 
-        function goToSlide(n) {
-            currentSlide = n;
-            showSlide(currentSlide);
-        }
+// Auto-rotate every 5 seconds
+let slideInterval = setInterval(nextSlide, 5000);
 
-        // Auto-rotate carousel every 5 seconds
-        setInterval(nextSlide, 5000);
+// Stop and restart timer if a user clicks a dot
+document.querySelectorAll('.dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 5000);
+    });
+});
 
         // TESTIMONIALS CAROUSEL
         let currentTestimonial = 0;
@@ -1902,6 +1921,7 @@ setInterval(() => {
     currentProject = (currentProject + 1) % projectSlides.length;
     goToProject(currentProject);
 }, 3000);
+
     </script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1957,6 +1977,12 @@ setInterval(() => {
             submitBtn.innerHTML = originalBtnText;
         }
     };
+
+
+    
+</script>
+<script>
+    
 </script>
 </body>
 </html>
