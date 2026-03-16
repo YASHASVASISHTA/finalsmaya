@@ -955,7 +955,7 @@
                     <a href="plot.html"class="btn btn-contact">
                         <i class="fas fa-phone"></i> Book Plot Online
                     </a>
-                    <button class="btn btn-whatsapp">
+                    <button id="modalWhatsappBtn" class="btn btn-whatsapp">
                         <i class="fab fa-whatsapp"></i> WhatsApp
                     </button>
                 </div>
@@ -1088,6 +1088,18 @@ document.getElementById('modalApprovals').textContent = (project.approval && pro
         const approvalText = (project.approval && project.approval.trim() !== "") ? project.approval : "—";
     document.getElementById('modalApprovals').textContent = approvalText;
 
+
+    const whatsappBtn = document.getElementById('modalWhatsappBtn');
+    if (whatsappBtn) {
+        const phone = "919071756999"; // Your contact number
+        const message = `Hi, I am interested in : ${project.name}. Please share more details.`;
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Update the button to open WhatsApp with the message
+        whatsappBtn.onclick = () => {
+            window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+        };
+    }
     // 3. Logic for RERA (Hide entirely if "Not Approved")
     const reraContainer = document.getElementById('reraContainer');
     if (project.rera === 'Approved') {
