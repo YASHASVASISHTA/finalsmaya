@@ -896,6 +896,10 @@
         <p id="modalSurveyNo"></p>
     </div>
     <div class="detail-item">
+    <h4>Loan Facility</h4>
+    <p id="modalLoan"></p>
+</div>
+    <div class="detail-item">
         <h4>Total Sites</h4>
         <p id="modalSites"></p>
     </div>
@@ -911,7 +915,7 @@
 
                 <!-- Approvals & RERA -->
                 <div style="margin-bottom: 48px; padding-bottom: 48px; border-bottom: 2px solid rgba(227, 221, 211, 0.3);">
-                    <h2 style="font-size: 28px; margin-bottom: 20px; color: var(--brown);">Approvals & Certifications</h2>
+                    <h2 style="font-size: 28px; margin-bottom: 20px; color: var(--brown);">Approvals </h2>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                         <div>
                             <h4 style="font-size: 13px; color: var(--gold); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 8px;">Authority Approvals</h4>
@@ -1087,7 +1091,7 @@ document.getElementById('modalApprovals').textContent = (project.approval && pro
 
         const approvalText = (project.approval && project.approval.trim() !== "") ? project.approval : "—";
     document.getElementById('modalApprovals').textContent = approvalText;
-
+document.getElementById('modalLoan').textContent = project.loanFacility || '-';
 
     const whatsappBtn = document.getElementById('modalWhatsappBtn');
     if (whatsappBtn) {
@@ -1117,12 +1121,10 @@ document.getElementById('modalApprovals').textContent = (project.approval && pro
         const surveyContainer = document.getElementById('surveyNoContainer');
     const surveyText = document.getElementById('modalSurveyNo');
     
-    if (project.surveyNo && project.surveyNo.trim() !== "") {
+   
         surveyText.textContent = project.surveyNo;
         surveyContainer.style.display = "block";
-    } else {
-        surveyContainer.style.display = "none";
-    }
+  
     
         // CHANGED: Create array with plotImg strictly at index 0
         let allImages = [];
