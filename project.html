@@ -917,7 +917,7 @@
                             <h4 style="font-size: 13px; color: var(--gold); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 8px;">Authority Approvals</h4>
                             <p id="modalApprovals" style="font-size: 14px; color: var(--brown-medium); line-height: 1.8;"></p>
                         </div>
-                        <div>
+                        <div id="reraContainer">
                             <h4 style="font-size: 13px; color: var(--gold); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 8px;">RERA Status</h4>
                             <p id="modalRera" style="font-size: 14px; color: var(--brown-medium); line-height: 1.8;"></p>
                         </div>
@@ -1070,6 +1070,7 @@
         const project = projects.find(p => p.id === projectId);
         if (!project) return;
 
+        
         // Header & Details - Hero image is now Plot Image
         document.getElementById('modalHeroImg').src = project.plotImg || (project.gallery?.[0] || '');
         document.getElementById('modalTitle').textContent = project.name;
@@ -1078,10 +1079,23 @@
         document.getElementById('modalSites').textContent = project.sites || '—';
         document.getElementById('modalDimension').textContent = project.dimension || '—';
         document.getElementById('modalFacing').textContent = project.facing || '—';
-        document.getElementById('modalApprovals').textContent = project.approval || 'Pending';
+ // To this:
+document.getElementById('modalApprovals').textContent = (project.approval && project.approval.trim() !== "") ? project.approval : "—";
         document.getElementById('modalRera').textContent = project.rera || '—';
         document.getElementById('modalLocation').textContent = project.address || '—';
         document.getElementById('modalMapLink').href = project.mapLink || '#';
+
+        const approvalText = (project.approval && project.approval.trim() !== "") ? project.approval : "—";
+    document.getElementById('modalApprovals').textContent = approvalText;
+
+    // 3. Logic for RERA (Hide entirely if "Not Approved")
+    const reraContainer = document.getElementById('reraContainer');
+    if (project.rera === 'Approved') {
+        reraContainer.style.display = "block";
+        document.getElementById('modalRera').textContent = "Approved";
+    } else {
+        reraContainer.style.display = "none";
+    }
 
         // Carousel Images
         const carouselSlides = document.getElementById('carouselSlides');
@@ -1097,7 +1111,7 @@
     } else {
         surveyContainer.style.display = "none";
     }
-
+    
         // CHANGED: Create array with plotImg strictly at index 0
         let allImages = [];
         if (project.plotImg) allImages.push(project.plotImg);
@@ -1114,7 +1128,7 @@
             dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
             controls.appendChild(dot);
         });
-
+        
         // Highlights
         const highlights = document.getElementById('modalHighlights');
         highlights.innerHTML = '';
