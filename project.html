@@ -1033,10 +1033,12 @@
             card.onclick = () => openProjectModal(project.id);
 
             // CHANGED: Priority is now plotImg, then gallery
-            const displayImg = project.plotImg 
-                ? project.plotImg 
-                : (project.gallery && project.gallery.length > 0 ? project.gallery[0] : 'https://via.placeholder.com/400x250?text=No+Map+Available');
-
+           // Priority 1: First gallery image
+// Priority 2: Plot image
+// Priority 3: Placeholder
+const displayImg = (project.gallery && project.gallery.length > 0)
+    ? project.gallery[0] 
+    : (project.plotImg ? project.plotImg : 'https://via.placeholder.com/400x250?text=No+Map+Available');
             let badgeClass = '';
             const status = project.progress?.toLowerCase() || '';
             if (status === 'completed') badgeClass = 'status-completed';
@@ -1076,7 +1078,7 @@
 
         
         // Header & Details - Hero image is now Plot Image
-        document.getElementById('modalHeroImg').src = project.plotImg || (project.gallery?.[0] || '');
+        document.getElementById('modalHeroImg').src = (project.gallery?.[0] || project.plotImg || '');
         document.getElementById('modalTitle').textContent = project.name;
         document.getElementById('modalBadge').textContent = project.progress;
         document.getElementById('modalArea').textContent = project.area || '—';
@@ -1127,22 +1129,26 @@ document.getElementById('modalLoan').textContent = project.loanFacility || '-';
   
     
         // CHANGED: Create array with plotImg strictly at index 0
-        let allImages = [];
-        if (project.plotImg) allImages.push(project.plotImg);
-        if (project.gallery) allImages = [...allImages, ...project.gallery];
+        // 1. Start with the gallery images (or an empty array if none exist)
+let allImages = project.gallery ? [...project.gallery] : [];
 
-        allImages.forEach((img, index) => {
-            const slide = document.createElement('div');
-            slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
-            slide.innerHTML = `<img src="${img}" alt="Project View ${index + 1}">`;
-            carouselSlides.appendChild(slide);
+// 2. Add the plotImg to the end of the array
+if (project.plotImg) {
+    allImages.push(project.plotImg);
+}
 
-            const dot = document.createElement('span');
-            dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
-            dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
-            controls.appendChild(dot);
-        });
-        
+allImages.forEach((img, index) => {
+    const slide = document.createElement('div');
+    // The rest of your logic remains the same...
+    slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
+    slide.innerHTML = `<img src="${img}" alt="Project View ${index + 1}">`;
+    carouselSlides.appendChild(slide);
+
+    const dot = document.createElement('span');
+    dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+    dot.onclick = (e) => { e.stopPropagation(); goToSlide(index); };
+    controls.appendChild(dot);
+});
         // Highlights
         const highlights = document.getElementById('modalHighlights');
         highlights.innerHTML = '';
